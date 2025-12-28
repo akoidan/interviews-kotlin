@@ -7,16 +7,40 @@ data class WindowItem(
 
 class Solution {
     fun maxSlidingWindow(nums: IntArray, k: Int): IntArray {
+        if (k < 1) {
+            throw IllegalArgumentException("Illegal sliding window size")
+        }
+        if (nums.size < k) {
+            throw IllegalArgumentException("Array should be greater sliding window")
+        }
+        if (k == 1) {
+            return nums
+        }
 
+        val result = ArrayList<Int>() // nums.size - k + 1
         val deq = ArrayDeque<WindowItem>()
         deq.add(WindowItem(0, nums[0]))
-        for (i in 1 until k) {
+        for (i in 1 until k - 1) {
             if (nums[i] >= deq[0].value) {
                 deq.clear()
-                deq.add(WindowItem(i, nums[i]))
-            } else if (i - deq[0].index > k){
-
             }
+            deq.add(WindowItem(i, nums[i]))
         }
+
+        for (i in k - 1 until nums.size) {
+            if (deq.size >= k || deq.first().index < i - k + 1) {
+                deq.removeFirst()
+            }
+            if (nums[i] >= deq[0].value) {
+                deq.clear()
+            }
+            while (deq.isNotEmpty() && deq.last().value <= nums[i]) {
+                deq.removeLast()
+            }
+            deq.add(WindowItem(i, nums[i]))
+            result.add(deq[0].value)
+        }
+
+        return result.toIntArray()
     }
 }
